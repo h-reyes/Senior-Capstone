@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" href="/styles.css" />
+</head>
+
+<body>
+    <header class="site-header">
+        <a class="site-logo" href="/">The Bank</a>
+        <nav class="site-nav" aria-label="Primary navigation">
+            <a href="/">Home</a>
+            <a href="/login" aria-current="page">Login</a>
+        </nav>
+    </header>
+
+    <main class="login-shell">
+        <section class="login-card" aria-labelledby="login-title">
+            <div class="brand-mark" aria-hidden="true">S</div>
+            <h1 id="login-title">Welcome back</h1>
+            <p>Sign in to continue to your account dashboard.</p>
+
+            <form id="loginForm">
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email"
+                        required />
+                </div>
+
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" placeholder="Password"
+                        autocomplete="current-password" required />
+                </div>
+
+                <button type="submit">Log in</button>
+            </form>
+
+            <div id="message" class="message" role="status" aria-live="polite"></div>
+        </section>
+    </main>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const messageEl = document.getElementById('message');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            messageEl.textContent = 'Signing in...';
+            messageEl.className = 'message';
+
+            const formData = new FormData(form);
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Accept': 'application/json' },
+                body: new URLSearchParams(formData)
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                messageEl.textContent = 'Login successful! Redirecting...';
+                messageEl.className = 'message success';
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 900);
+            } else {
+                messageEl.textContent = result.error || 'Login failed. Please try again.';
+                messageEl.className = 'message error';
+            }
+        });
+    </script>
+</body>
+
+</html>
