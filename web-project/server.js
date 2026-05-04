@@ -40,8 +40,8 @@ app.use(express.static(path.join(__dirname, 'public'), {
     index: false,
 }));
 
-app.use(pageRoutes);
 app.use(authRoutes);
+app.use(pageRoutes);
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

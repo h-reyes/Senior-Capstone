@@ -65,6 +65,26 @@ body {
     box-shadow: 0 8px 22px rgba(20, 33, 61, 0.08);
 }
 
+.logout-form {
+    margin: 0;
+}
+
+.logout-form button {
+    width: auto;
+    min-height: 36px;
+    margin: 0;
+    padding: 8px 12px;
+    background: #ffffff;
+    color: #b42318;
+    box-shadow: none;
+    font-size: 0.95rem;
+}
+
+.logout-form button:hover {
+    background: #fff1f0;
+    box-shadow: 0 8px 22px rgba(180, 35, 24, 0.08);
+}
+
 .login-shell,
 .home-shell,
 .dashboard-shell {
@@ -135,6 +155,153 @@ body {
 .home-panel,
 .dashboard-panel {
     width: min(720px, 100%);
+}
+
+.dashboard-panel {
+    width: min(1040px, 100%);
+}
+
+.dashboard-overview > p {
+    max-width: 620px;
+}
+
+.account-nav {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.wallet-summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 24px;
+    margin: 24px 0;
+    padding: 24px;
+    background: #ffffff;
+    border: 1px solid rgba(101, 116, 139, 0.16);
+    border-radius: 8px;
+}
+
+.wallet-summary h2 {
+    margin: 0 0 8px;
+    color: #111827;
+    font-size: 1.35rem;
+}
+
+.wallet-summary p:last-child {
+    margin-bottom: 0;
+}
+
+.wallet-summary button {
+    width: auto;
+    min-width: 180px;
+    margin: 0;
+}
+
+.balance-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin: 22px 0 24px;
+    padding: 22px;
+    background: #111827;
+    border-radius: 8px;
+    color: #ffffff;
+}
+
+.balance-summary span {
+    color: #cbd5e1;
+    font-weight: 700;
+}
+
+.balance-summary strong {
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+}
+
+.balance-summary small {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    color: #94a3b8;
+    font-size: 0.82rem;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.account-tool {
+    padding: 22px;
+    background: #ffffff;
+    border: 1px solid rgba(101, 116, 139, 0.16);
+    border-radius: 8px;
+}
+
+.account-tool h2 {
+    margin: 0 0 18px;
+    color: #111827;
+    font-size: 1.15rem;
+}
+
+.transactions-panel,
+.blockchain-panel {
+    grid-column: 1 / -1;
+}
+
+.blockchain-panel p {
+    margin-bottom: 18px;
+}
+
+.history-link {
+    margin-left: 0;
+}
+
+.history-link[aria-disabled="true"] {
+    pointer-events: none;
+    color: #8a94a6;
+    background: #f3f6fb;
+    border-color: #d7dee9;
+}
+
+.transaction-list {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.transaction-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid #e5eaf2;
+}
+
+.transaction-list li:last-child {
+    border-bottom: 0;
+}
+
+.transaction-list span {
+    color: #5b6577;
+}
+
+.transaction-list strong {
+    color: #111827;
+}
+
+.transaction-list a {
+    color: #1f5eff;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.transaction-list a:hover {
+    text-decoration: underline;
 }
 
 .brand-mark {
@@ -308,6 +475,28 @@ button:active,
 
     .pitch-grid {
         grid-template-columns: 1fr;
+    }
+
+    .site-nav {
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .wallet-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .wallet-summary button {
+        width: 100%;
+    }
+
+    .balance-summary {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
     .primary-link,

@@ -1,5 +1,10 @@
 const express = require('express');
-const { createSession, setSessionCookie } = require('../auth/sessionStore');
+const {
+    clearSessionCookie,
+    createSession,
+    destroySession,
+    setSessionCookie,
+} = require('../auth/sessionStore');
 
 const router = express.Router();
 
@@ -45,6 +50,33 @@ router.post('/signup', (req, res) => {
     users.push({ name, email, password });
 
     return res.status(201).json({ success: true });
+});
+
+router.post('/logout', (req, res) => {
+    destroySession(req);
+    clearSessionCookie(res);
+    return res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <meta http-equiv="refresh" content="2;url=/" />
+            <title>Logged Out</title>
+            <link rel="stylesheet" href="/styles.css" />
+        </head>
+        <body>
+            <main class="login-shell">
+                <section class="login-card" aria-labelledby="logout-title">
+                    <div class="brand-mark" aria-hidden="true">S</div>
+                    <h1 id="logout-title">Successfully logged out</h1>
+                    <p>Redirecting to home.</p>
+                    <a class="primary-link" href="/">Go home now</a>
+                </section>
+            </main>
+        </body>
+        </html>
+    `);
 });
 
 module.exports = router;

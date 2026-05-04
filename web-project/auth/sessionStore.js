@@ -38,6 +38,15 @@ function getSession(req) {
     return sessions.get(sessionId) || null;
 }
 
+function destroySession(req) {
+    const cookies = parseCookies(req.headers.cookie);
+    const sessionId = cookies[SESSION_COOKIE];
+
+    if (sessionId) {
+        sessions.delete(sessionId);
+    }
+}
+
 function requireLogin(req, res, next) {
     const session = getSession(req);
 
@@ -49,9 +58,19 @@ function requireLogin(req, res, next) {
     return next();
 }
 
+function clearSessionCookie(res) {
+    res.clearCookie(SESSION_COOKIE, {
+        httpOnly: true,
+        path: '/',
+        sameSite: 'lax',
+        secure: false,
+    });
+}
+
 function setSessionCookie(res, sessionId) {
     res.cookie(SESSION_COOKIE, sessionId, {
         httpOnly: true,
+        path: '/',
         sameSite: 'lax',
         secure: false,
         maxAge: 1000 * 60 * 60,
@@ -59,7 +78,9 @@ function setSessionCookie(res, sessionId) {
 }
 
 module.exports = {
+    clearSessionCookie,
     createSession,
+    destroySession,
     requireLogin,
     setSessionCookie,
 };

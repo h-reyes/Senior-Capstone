@@ -11,20 +11,177 @@
 <body>
     <header class="site-header">
         <a class="site-logo" href="/">The Bank</a>
-        <nav class="site-nav" aria-label="Primary navigation">
-            <a href="/">Home</a>
-            <a href="/login">Login</a>
-            <a href="/signup">Sign up</a>
+        <nav class="site-nav account-nav" aria-label="Account navigation">
+            <a href="#balance">Balance</a>
+            <a href="#transactions">Transactions</a>
+            <a href="#history">Blockchain history</a>
+            <a href="#wallet">Wallet</a>
+            <form class="logout-form" action="/logout" method="POST">
+                <button type="submit">Log out</button>
+            </form>
         </nav>
     </header>
 
     <main class="dashboard-shell">
-        <section class="dashboard-panel" aria-labelledby="dashboard-title">
-            <h1 id="dashboard-title">Dashboard</h1>
-            <p>You are now logged in.</p>
-            <a class="primary-link" href="/login">Back to login</a>
+        <section class="dashboard-panel dashboard-overview" aria-labelledby="dashboard-title">
+            <p class="eyebrow">Logged in</p>
+            <h1 id="dashboard-title">Account dashboard</h1>
+            <p>Connect MetaMask to inspect wallet balance, transactions, and blockchain activity.</p>
+
+            <section class="wallet-summary" id="wallet" aria-labelledby="wallet-title">
+                <div>
+                    <p class="eyebrow">MetaMask Wallet</p>
+                    <h2 id="wallet-title">Connect your wallet</h2>
+                    <p id="walletStatus">Use MetaMask to view your public wallet balance from this dashboard.</p>
+                </div>
+                <button id="connectWalletButton" type="button">Connect MetaMask</button>
+            </section>
+
+            <section class="balance-summary" id="balance" aria-label="Wallet balance">
+                <span>Wallet balance</span>
+                <strong id="walletBalance">Not connected</strong>
+                <small id="walletAddress"></small>
+            </section>
+
+            <div class="dashboard-grid">
+                <section class="account-tool transactions-panel" id="transactions" aria-labelledby="transactions-title">
+                    <h2 id="transactions-title">Wallet transactions</h2>
+                    <ul class="transaction-list" id="transactionList">
+                        <li>
+                            <span>Connect MetaMask to view this wallet on a block explorer.</span>
+                            <strong>Pending</strong>
+                        </li>
+                    </ul>
+                </section>
+
+                <section class="account-tool blockchain-panel" id="history" aria-labelledby="history-title">
+                    <h2 id="history-title">Blockchain history</h2>
+                    <p id="historyText">
+                        Once connected, you can open this wallet's blockchain history on the explorer for the selected
+                        network.
+                    </p>
+                    <a class="secondary-link history-link" id="historyLink" href="#" aria-disabled="true">Explorer unavailable</a>
+                </section>
+            </div>
         </section>
     </main>
+
+    <script>
+        const connectWalletButton = document.getElementById('connectWalletButton');
+        const walletStatus = document.getElementById('walletStatus');
+        const walletBalance = document.getElementById('walletBalance');
+        const walletAddress = document.getElementById('walletAddress');
+        const transactionList = document.getElementById('transactionList');
+        const historyText = document.getElementById('historyText');
+        const historyLink = document.getElementById('historyLink');
+
+        const explorersByChainId = {
+            '0x1': 'https://etherscan.io/address/',
+            '0xaa36a7': 'https://sepolia.etherscan.io/address/',
+            '0x5': 'https://goerli.etherscan.io/address/',
+            '0x89': 'https://polygonscan.com/address/',
+        };
+
+        function shortenAddress(address) {
+            return `${address.slice(0, 6)}...${address.slice(-4)}`;
+        }
+
+        function weiToEth(weiHex) {
+            const wei = BigInt(weiHex);
+            const whole = wei / 1000000000000000000n;
+            const fraction = wei % 1000000000000000000n;
+            const fractionText = fraction.toString().padStart(18, '0').slice(0, 4);
+
+            return `${whole}.${fractionText} ETH`;
+        }
+
+        async function updateWallet(address) {
+            const [balanceHex, chainId] = await Promise.all([
+                window.ethereum.request({
+                    method: 'eth_getBalance',
+                    params: [address, 'latest']
+                }),
+                window.ethereum.request({ method: 'eth_chainId' })
+            ]);
+
+            const explorerBaseUrl = explorersByChainId[chainId];
+            walletStatus.textContent = `Connected to ${shortenAddress(address)}.`;
+            walletBalance.textContent = weiToEth(balanceHex);
+            walletAddress.textContent = address;
+            connectWalletButton.textContent = 'Refresh wallet';
+
+            transactionList.innerHTML = '';
+            const listItem = document.createElement('li');
+            const label = document.createElement('span');
+            const action = document.createElement('strong');
+
+            label.textContent = 'Recent on-chain activity';
+
+            if (explorerBaseUrl) {
+                const explorerUrl = `${explorerBaseUrl}${address}`;
+                const explorerLink = document.createElement('a');
+                explorerLink.href = explorerUrl;
+                explorerLink.target = '_blank';
+                explorerLink.rel = 'noreferrer';
+                explorerLink.textContent = 'View transactions';
+                action.appendChild(explorerLink);
+
+                historyText.textContent = 'Open the connected wallet on the current network explorer to review blockchain activity.';
+                historyLink.href = explorerUrl;
+                historyLink.textContent = 'View blockchain history';
+                historyLink.removeAttribute('aria-disabled');
+            } else {
+                action.textContent = 'Explorer unavailable';
+                historyText.textContent = 'This network is connected, but no explorer has been configured for it yet.';
+                historyLink.href = '#';
+                historyLink.textContent = 'Explorer unavailable';
+                historyLink.setAttribute('aria-disabled', 'true');
+            }
+
+            listItem.append(label, action);
+            transactionList.appendChild(listItem);
+        }
+
+        async function connectWallet() {
+            if (!window.ethereum) {
+                walletStatus.textContent = 'MetaMask is not installed in this browser.';
+                walletBalance.textContent = 'Unavailable';
+                return;
+            }
+
+            try {
+                walletStatus.textContent = 'Waiting for MetaMask approval...';
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                await updateWallet(accounts[0]);
+            } catch (error) {
+                walletStatus.textContent = 'Wallet connection was cancelled or failed.';
+            }
+        }
+
+        connectWalletButton.addEventListener('click', connectWallet);
+
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                    walletStatus.textContent = 'MetaMask disconnected.';
+                    walletBalance.textContent = 'Not connected';
+                    walletAddress.textContent = '';
+                    connectWalletButton.textContent = 'Connect MetaMask';
+                    historyText.textContent = 'Once connected, you can open this wallet\'s blockchain history on the explorer for the selected network.';
+                    historyLink.href = '#';
+                    historyLink.textContent = 'Explorer unavailable';
+                    historyLink.setAttribute('aria-disabled', 'true');
+                    return;
+                }
+
+                updateWallet(accounts[0]);
+            });
+
+            window.ethereum.on('chainChanged', () => {
+                window.location.reload();
+            });
+        }
+    </script>
 </body>
 
 </html>
