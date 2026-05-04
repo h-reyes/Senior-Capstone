@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login</title>
+    <title>Sign Up</title>
     <link rel="stylesheet" href="/styles.css" />
 </head>
 
@@ -13,18 +13,23 @@
         <a class="site-logo" href="/">The Bank</a>
         <nav class="site-nav" aria-label="Primary navigation">
             <a href="/">Home</a>
-            <a href="/login" aria-current="page">Login</a>
-            <a href="/signup">Sign up</a>
+            <a href="/login">Login</a>
+            <a href="/signup" aria-current="page">Sign up</a>
         </nav>
     </header>
 
     <main class="login-shell">
-        <section class="login-card" aria-labelledby="login-title">
+        <section class="login-card" aria-labelledby="signup-title">
             <div class="brand-mark" aria-hidden="true">S</div>
-            <h1 id="login-title">Welcome back</h1>
-            <p>Sign in to continue to your account dashboard.</p>
+            <h1 id="signup-title">Create account</h1>
+            <p>Sign up to access your account dashboard.</p>
 
-            <form id="loginForm">
+            <form id="signupForm">
+                <div class="field">
+                    <label for="name">Name</label>
+                    <input id="name" name="name" type="text" placeholder="Joe Smith" autocomplete="name" required />
+                </div>
+
                 <div class="field">
                     <label for="email">Email</label>
                     <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email"
@@ -34,28 +39,34 @@
                 <div class="field">
                     <label for="password">Password</label>
                     <input id="password" name="password" type="password" placeholder="Password"
-                        autocomplete="current-password" required />
+                        autocomplete="new-password" required />
                 </div>
 
-                <button type="submit">Log in</button>
+                <div class="field">
+                    <label for="confirmPassword">Confirm password</label>
+                    <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm password"
+                        autocomplete="new-password" required />
+                </div>
+
+                <button type="submit">Sign up</button>
             </form>
 
             <div id="message" class="message" role="status" aria-live="polite"></div>
-            <p class="auth-switch">Need an account? <a href="/signup">Create one</a></p>
+            <p class="auth-switch">Already have an account? <a href="/login">Log in</a></p>
         </section>
     </main>
 
     <script>
-        const form = document.getElementById('loginForm');
+        const form = document.getElementById('signupForm');
         const messageEl = document.getElementById('message');
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
-            messageEl.textContent = 'Signing in...';
+            messageEl.textContent = 'Creating account...';
             messageEl.className = 'message';
 
             const formData = new FormData(form);
-            const response = await fetch('/login', {
+            const response = await fetch('/signup', {
                 method: 'POST',
                 headers: { 'Accept': 'application/json' },
                 body: new URLSearchParams(formData)
@@ -63,13 +74,13 @@
 
             const result = await response.json();
             if (response.ok) {
-                messageEl.textContent = 'Login successful! Redirecting...';
+                messageEl.textContent = 'Account created! Redirecting to login...';
                 messageEl.className = 'message success';
                 setTimeout(() => {
-                    window.location.href = '/dashboard';
+                    window.location.href = '/login';
                 }, 900);
             } else {
-                messageEl.textContent = result.error || 'Login failed. Please try again.';
+                messageEl.textContent = result.error || 'Sign up failed. Please try again.';
                 messageEl.className = 'message error';
             }
         });

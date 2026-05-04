@@ -1,19 +1,45 @@
 const path = require('path');
 const express = require('express');
+const { requireLogin } = require('../auth/sessionStore');
 
 const router = express.Router();
-const viewsPath = path.join(__dirname, '..', 'views');
+const viewsPath = path.resolve(__dirname, '..', 'views');
+const allowedViews = new Set([
+    'home.html',
+    'login.html',
+    'signup.html',
+    'dashboard.html',
+]);
+
+function sendView(res, fileName) {
+    if (!allowedViews.has(fileName)) {
+        return res.status(404).send('Not found');
+    }
+
+    const filePath = path.resolve(viewsPath, fileName);
+    const relativePath = path.relative(viewsPath, filePath);
+
+    if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+        return res.status(403).send('Forbidden');
+    }
+
+    return res.sendFile(filePath);
+}
 
 router.get('/', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'home.html'));
+    sendView(res, 'home.html');
 });
 
 router.get('/login', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'login.html'));
+    sendView(res, 'login.html');
 });
 
-router.get('/dashboard', (req, res) => {
-    res.sendFile(path.join(viewsPath, 'dashboard.html'));
+router.get('/signup', (req, res) => {
+    sendView(res, 'signup.html');
+});
+
+router.get('/dashboard', requireLogin, (req, res) => {
+    sendView(res, 'dashboard.html');
 });
 
 module.exports = router;
