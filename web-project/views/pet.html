@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crypto Pet</title>
+    <link rel="stylesheet" href="/styles.css" />
+</head>
+
+<body>
+    <header class="site-header">
+        <a class="site-logo" href="/">The Bank</a>
+        <nav class="site-nav account-nav" aria-label="Account navigation">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/pet" aria-current="page">Pet</a>
+            <form class="logout-form" action="/logout" method="POST">
+                <button type="submit">Log out</button>
+            </form>
+        </nav>
+    </header>
+
+    <main class="pet-shell">
+        <section class="pet-panel" aria-labelledby="pet-title">
+            <div class="pet-heading">
+                <div>
+                    <p class="eyebrow">MetaMask Mini Game</p>
+                    <h1 id="pet-title">Polygon pet care</h1>
+                    <p>Rest for free, then buy food and accessories with your connected wallet.</p>
+                </div>
+                <button class="wallet-button" id="petWalletButton" type="button">Connect MetaMask</button>
+            </div>
+
+            <section class="pet-game-grid">
+                <div class="pet-stage" aria-live="polite">
+                    <div class="pet-accessory-layer" id="petAccessoryLayer"></div>
+                    <div class="polygon-pet" id="polygonPet"></div>
+                    <img class="custom-pet" id="customPet" alt="" />
+                    <p class="pet-mood" id="petMood">Your pet is curious.</p>
+                </div>
+
+                <aside class="pet-controls" aria-label="Pet care controls">
+                    <div class="pet-name-row">
+                        <input id="petNameInput" maxlength="24" placeholder="Name your pet" />
+                        <button id="savePetNameButton" type="button">Save</button>
+                    </div>
+
+                    <div class="stat-list" aria-label="Pet stats">
+                        <label>Hunger <meter id="hungerMeter" min="0" max="100" value="72"></meter></label>
+                        <label>Happiness <meter id="happinessMeter" min="0" max="100" value="66"></meter></label>
+                        <label>Energy <meter id="energyMeter" min="0" max="100" value="81"></meter></label>
+                    </div>
+
+                    <div class="pet-action-row">
+                        <button id="restButton" type="button">Rest</button>
+                    </div>
+
+                    <label class="merchant-field">
+                        Burn contract address
+                        <input id="burnContractAddressInput" placeholder="0x..." autocomplete="off" />
+                    </label>
+                    <p class="wallet-note" id="petWalletStatus">Connect MetaMask and enter a deployed burn contract before buying.</p>
+                </aside>
+            </section>
+
+            <section class="pet-shop" aria-labelledby="shop-title">
+                <div class="shop-heading">
+                    <h2 id="shop-title">Shop</h2>
+                    <p>Purchases send crypto to a burn contract. Drop images into <code>public/assets/pet/food</code>, <code>accessories</code>, or <code>pets</code>.</p>
+                </div>
+                <div class="shop-grid" id="shopGrid"></div>
+            </section>
+        </section>
+    </main>
+
+    <script src="/pet-game.js"></script>
+</body>
+
+</html>

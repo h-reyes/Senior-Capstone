@@ -2,9 +2,10 @@ const path = require('path');
 const express = require('express');
 const pageRoutes = require('./routes/pageRoutes');
 const authRoutes = require('./routes/authRoutes');
+const petAssetRoutes = require('./routes/petAssetRoutes');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 function blockDirectoryTraversal(req, res, next) {
     let decodedUrl = req.url;
@@ -41,6 +42,7 @@ app.use(express.static(path.join(__dirname, 'public'), {
 }));
 
 app.use(authRoutes);
+app.use(petAssetRoutes);
 app.use(pageRoutes);
 
 app.listen(port, () => {

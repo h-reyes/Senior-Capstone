@@ -7,11 +7,20 @@
   "type": "commonjs",
   "main": "server.js",
   "scripts": {
+    "compile": "hardhat compile",
+    "deploy:sepolia": "hardhat run scripts/deploy-pet-burn-vault.js --network sepolia",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^5.2.1",
+    "node": "^24.15.0",
     "sequelize": "^6.37.8"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "dotenv": "^17.4.2",
+    "ethers": "^5.8.0",
+    "hardhat": "^2.28.6"
   }
 }

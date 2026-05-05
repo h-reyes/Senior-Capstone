@@ -9,6 +9,7 @@ const allowedViews = new Set([
     'login.html',
     'signup.html',
     'dashboard.html',
+    'pet.html',
 ]);
 
 function sendView(res, fileName) {
@@ -40,6 +41,10 @@ router.get('/signup', (req, res) => {
 
 router.get('/dashboard', requireLogin, (req, res) => {
     sendView(res, 'dashboard.html');
+});
+
+router.get('/pet', requireLogin, (req, res) => {
+    sendView(res, 'pet.html');
 });
 
 module.exports = router;

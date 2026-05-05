@@ -87,14 +87,16 @@ body {
 
 .login-shell,
 .home-shell,
-.dashboard-shell {
+.dashboard-shell,
+.pet-shell {
     display: grid;
     place-items: center;
     padding: 48px 24px 40px;
 }
 
 .login-shell,
-.dashboard-shell {
+.dashboard-shell,
+.pet-shell {
     min-height: 100vh;
     padding-top: 112px;
 }
@@ -143,7 +145,8 @@ body {
 
 .login-card,
 .home-panel,
-.dashboard-panel {
+.dashboard-panel,
+.pet-panel {
     width: min(440px, 100%);
     padding: 36px;
     background: rgba(255, 255, 255, 0.92);
@@ -159,6 +162,10 @@ body {
 
 .dashboard-panel {
     width: min(1040px, 100%);
+}
+
+.pet-panel {
+    width: min(1120px, 100%);
 }
 
 .dashboard-overview > p {
@@ -302,6 +309,251 @@ body {
 
 .transaction-list a:hover {
     text-decoration: underline;
+}
+
+.pet-heading,
+.pet-game-grid,
+.shop-heading {
+    display: grid;
+    gap: 20px;
+}
+
+.pet-heading {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    margin-bottom: 24px;
+}
+
+.pet-heading p:last-child,
+.shop-heading p {
+    margin-bottom: 0;
+}
+
+.wallet-button {
+    width: auto;
+    min-width: 184px;
+    margin: 0;
+}
+
+.pet-game-grid {
+    grid-template-columns: minmax(280px, 1.1fr) minmax(280px, 0.9fr);
+    align-items: stretch;
+}
+
+.pet-stage,
+.pet-controls,
+.pet-shop {
+    background: #ffffff;
+    border: 1px solid rgba(101, 116, 139, 0.16);
+    border-radius: 8px;
+}
+
+.pet-stage {
+    position: relative;
+    min-height: 420px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    padding: 28px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(238, 244, 255, 0.9)),
+        repeating-linear-gradient(90deg, rgba(31, 94, 255, 0.06) 0 1px, transparent 1px 64px);
+}
+
+.polygon-pet,
+.custom-pet {
+    width: min(260px, 70vw);
+    aspect-ratio: 1;
+    filter: drop-shadow(0 24px 28px rgba(20, 33, 61, 0.24));
+}
+
+.polygon-pet {
+    border: 10px solid rgba(255, 255, 255, 0.62);
+    animation: pet-bob 3s ease-in-out infinite;
+}
+
+.custom-pet {
+    object-fit: contain;
+    animation: pet-bob 3s ease-in-out infinite;
+}
+
+.pet-accessory-layer {
+    position: absolute;
+    inset: 28px;
+    display: grid;
+    place-items: start center;
+    pointer-events: none;
+}
+
+.pet-accessory-layer img {
+    width: min(180px, 48vw);
+    max-height: 150px;
+    object-fit: contain;
+    filter: drop-shadow(0 12px 18px rgba(20, 33, 61, 0.2));
+}
+
+.pet-mood {
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    bottom: 20px;
+    margin: 0;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.84);
+    border: 1px solid rgba(101, 116, 139, 0.14);
+    border-radius: 8px;
+    color: #172033;
+    font-weight: 800;
+    text-align: center;
+}
+
+.pet-controls {
+    display: grid;
+    align-content: start;
+    gap: 18px;
+    padding: 22px;
+}
+
+.pet-name-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+}
+
+.pet-name-row button {
+    width: auto;
+    min-width: 92px;
+    margin: 0;
+}
+
+.stat-list {
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+    background: #f8fafc;
+    border: 1px solid #e5eaf2;
+    border-radius: 8px;
+}
+
+.stat-list label {
+    margin: 0;
+}
+
+meter {
+    width: 100%;
+    height: 16px;
+    display: block;
+    margin-top: 8px;
+}
+
+.pet-action-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.pet-action-row button {
+    min-height: 46px;
+    margin: 0;
+    padding-inline: 12px;
+}
+
+.merchant-field {
+    margin: 0;
+}
+
+.wallet-note {
+    min-height: 28px;
+    margin: 0;
+    color: #5b6577;
+    font-size: 0.95rem;
+}
+
+.pet-shop {
+    margin-top: 18px;
+    padding: 22px;
+}
+
+.shop-heading {
+    grid-template-columns: minmax(0, 1fr);
+    margin-bottom: 18px;
+}
+
+.shop-heading h2 {
+    margin: 0;
+    color: #111827;
+    font-size: 1.25rem;
+}
+
+.shop-heading code {
+    color: #1f5eff;
+    font-weight: 800;
+}
+
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.shop-item {
+    min-height: 260px;
+    display: grid;
+    grid-template-rows: 118px auto auto auto auto;
+    gap: 8px;
+    padding: 14px;
+    background: #f8fafc;
+    border: 1px solid #e5eaf2;
+    border-radius: 8px;
+}
+
+.shop-preview {
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #6b7588;
+    font-weight: 900;
+}
+
+.shop-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.shop-type {
+    color: #1f5eff;
+    font-size: 0.78rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.shop-item h3 {
+    margin: 0;
+    color: #111827;
+    font-size: 1rem;
+}
+
+.shop-item strong {
+    color: #465468;
+}
+
+.shop-item button {
+    min-height: 44px;
+    margin: 4px 0 0;
+}
+
+@keyframes pet-bob {
+    0%,
+    100% {
+        transform: translateY(0) rotate(-1deg);
+    }
+
+    50% {
+        transform: translateY(-12px) rotate(1deg);
+    }
 }
 
 .brand-mark {
@@ -463,7 +715,8 @@ button:active,
 
     .login-shell,
     .home-shell,
-    .dashboard-shell {
+    .dashboard-shell,
+    .pet-shell {
         min-height: auto;
         padding: 28px 16px;
     }
@@ -490,6 +743,20 @@ button:active,
         grid-template-columns: 1fr;
     }
 
+    .pet-heading,
+    .pet-game-grid,
+    .shop-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .wallet-button {
+        width: 100%;
+    }
+
+    .pet-stage {
+        min-height: 340px;
+    }
+
     .wallet-summary button {
         width: 100%;
     }
@@ -510,7 +777,8 @@ button:active,
 
     .login-card,
     .home-panel,
-    .dashboard-panel {
+    .dashboard-panel,
+    .pet-panel {
         padding: 28px 22px;
     }
 }
