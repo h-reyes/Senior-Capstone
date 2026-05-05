@@ -1,0 +1,33 @@
+{
+  "items": [
+    {
+      "id": "default-crunchy-kibble",
+      "type": "food",
+      "name": "Crunchy Kibble",
+      "priceEth": "0.0001",
+      "effect": {
+        "hunger": 18,
+        "energy": -8
+      }
+    },
+    {
+      "id": "default-spark-collar",
+      "type": "accessory",
+      "name": "Spark Collar",
+      "priceEth": "0.0002",
+      "effect": {
+        "happiness": 12
+      }
+    },
+    {
+      "id": "default-random-color",
+      "type": "pet",
+      "name": "Random Color",
+      "priceEth": "0.0003",
+      "effect": {
+        "happiness": 8,
+        "energy": 4
+      }
+    }
+  ]
+}

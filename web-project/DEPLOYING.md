@@ -31,5 +31,10 @@ Hardhat will print:
 PetBurnVault deployed to: 0x...
 ```
 
-Copy that address into the pet game's burn contract address field.
+The deploy script also saves the address to:
 
+```text
+deployments/sepolia/PetBurnVault.json
+```
+
+Copy the printed address into the pet page's burn contract address field.

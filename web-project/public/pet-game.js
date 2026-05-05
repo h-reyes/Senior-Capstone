@@ -15,10 +15,30 @@ const shopGrid = document.getElementById('shopGrid');
 
 const stateKey = 'cryptoPetState';
 const weiPerEth = 1000000000000000000n;
-const defaultItems = [
-    { id: 'crunchy-kibble', type: 'food', name: 'Crunchy Kibble', priceEth: '0.0001', effect: { hunger: 18 } },
-    { id: 'spark-collar', type: 'accessory', name: 'Spark Collar', priceEth: '0.0002', effect: { happiness: 12 } },
-    { id: 'new-polygon', type: 'pet', name: 'Random Color', priceEth: '0.0003', effect: { happiness: 8, energy: 4 } },
+const decayIntervalMs = 15000;
+const dialogIntervalMs = 12000;
+const idleDialog = [
+    'I wonder what block number it is.',
+    'A snack would be excellent.',
+    'My polygon edges feel shiny today.',
+    'I am practicing my tiny dashboard stare.',
+    'Maybe the next accessory is the one.',
+    'I can hear MetaMask thinking.',
+];
+const hungryDialog = [
+    'Food thoughts are getting louder.',
+    'I could absolutely demolish a pixel snack.',
+    'My hunger bar is making dramatic choices.',
+];
+const tiredDialog = [
+    'A rest would hit perfectly right now.',
+    'My energy is buffering.',
+    'Low battery polygon mode activated.',
+];
+const lonelyDialog = [
+    'An accessory would cheer me up.',
+    'I am accepting compliments and shop items.',
+    'A little attention would be nice.',
 ];
 
 let walletAddress = '';
@@ -38,6 +58,7 @@ function loadPetState() {
         polygon: saved.polygon || randomPolygon(),
         owned: Array.isArray(saved.owned) ? saved.owned : [],
         burnContractAddress: saved.burnContractAddress || saved.merchantAddress || '',
+        lastUpdatedAt: Number.isFinite(saved.lastUpdatedAt) ? saved.lastUpdatedAt : Date.now(),
     };
 }
 
@@ -71,8 +92,27 @@ function applyEffect(effect = {}) {
     petState.hunger = clampStat(petState.hunger + (effect.hunger || 0));
     petState.happiness = clampStat(petState.happiness + (effect.happiness || 0));
     petState.energy = clampStat(petState.energy + (effect.energy || 0));
+    petState.lastUpdatedAt = Date.now();
     savePetState();
     renderPet();
+}
+
+function applyTimeDecay() {
+    const now = Date.now();
+    const elapsedIntervals = Math.floor((now - petState.lastUpdatedAt) / decayIntervalMs);
+
+    if (elapsedIntervals <= 0) {
+        return false;
+    }
+
+    petState.hunger = clampStat(petState.hunger - elapsedIntervals * 2);
+    petState.happiness = clampStat(petState.happiness - elapsedIntervals);
+    petState.energy = clampStat(petState.energy - elapsedIntervals);
+    petState.lastUpdatedAt += elapsedIntervals * decayIntervalMs;
+    savePetState();
+    renderPet();
+
+    return true;
 }
 
 function shortenAddress(address) {
@@ -140,6 +180,30 @@ function moodText() {
     return `${petState.name} is curious.`;
 }
 
+function randomFrom(items) {
+    return items[Math.floor(Math.random() * items.length)];
+}
+
+function dialogText() {
+    if (petState.hunger < 35) {
+        return randomFrom(hungryDialog);
+    }
+
+    if (petState.energy < 35) {
+        return randomFrom(tiredDialog);
+    }
+
+    if (petState.happiness < 35) {
+        return randomFrom(lonelyDialog);
+    }
+
+    return randomFrom(idleDialog);
+}
+
+function showRandomDialog() {
+    petMood.textContent = dialogText();
+}
+
 function renderPet() {
     petNameInput.value = petState.name;
     burnContractAddressInput.value = petState.burnContractAddress;
@@ -193,7 +257,7 @@ function renderShop(items) {
         type.textContent = item.type;
         price.textContent = `${item.priceEth} native`;
         buyButton.type = 'button';
-        buyButton.textContent = petState.owned.includes(item.id) ? 'Use' : 'Buy';
+        buyButton.textContent = petState.owned.includes(item.id) ? 'Buy again' : 'Buy';
 
         buyButton.addEventListener('click', () => buyOrUseItem(item));
         card.append(preview, type, title, price, buyButton);
@@ -220,11 +284,6 @@ async function connectWallet() {
 }
 
 async function buyOrUseItem(item) {
-    if (petState.owned.includes(item.id)) {
-        useItem(item);
-        return;
-    }
-
     if (!walletAddress) {
         await connectWallet();
     }
@@ -261,7 +320,10 @@ async function buyOrUseItem(item) {
             }],
         });
 
-        petState.owned.push(item.id);
+        if (!petState.owned.includes(item.id)) {
+            petState.owned.push(item.id);
+        }
+
         petState.burnContractAddress = burnContractAddress;
         savePetState();
         useItem(item);
@@ -282,7 +344,7 @@ function useItem(item) {
     }
 
     applyEffect(item.effect);
-    renderShop(window.petShopItems || defaultItems);
+        renderShop(window.petShopItems || []);
 }
 
 async function loadShopItems() {
@@ -290,37 +352,17 @@ async function loadShopItems() {
         const response = await fetch('/api/pet-assets');
         const assets = await response.json();
         const assetItems = [
-            ...assets.food.map((asset, index) => ({
-                id: `food-${asset.src}`,
-                type: 'food',
-                name: asset.name || `Food ${index + 1}`,
-                src: asset.src,
-                priceEth: '0.0001',
-                effect: { hunger: 22, happiness: 3 },
-            })),
-            ...assets.accessories.map((asset, index) => ({
-                id: `accessory-${asset.src}`,
-                type: 'accessory',
-                name: asset.name || `Accessory ${index + 1}`,
-                src: asset.src,
-                priceEth: '0.0002',
-                effect: { happiness: 16 },
-            })),
-            ...assets.pets.map((asset, index) => ({
-                id: `pet-${asset.src}`,
-                type: 'pet',
-                name: asset.name || `Pet ${index + 1}`,
-                src: asset.src,
-                priceEth: '0.0003',
-                effect: { happiness: 10 },
-            })),
+            ...(assets.defaults || []),
+            ...(assets.food || []),
+            ...(assets.accessories || []),
+            ...(assets.pets || []),
         ];
 
-        window.petShopItems = [...defaultItems, ...assetItems];
+        window.petShopItems = assetItems;
         renderShop(window.petShopItems);
     } catch (error) {
-        window.petShopItems = defaultItems;
-        renderShop(defaultItems);
+        window.petShopItems = [];
+        renderShop([]);
     }
 }
 
@@ -337,7 +379,7 @@ burnContractAddressInput.addEventListener('change', () => {
     savePetState();
 });
 
-restButton.addEventListener('click', () => applyEffect({ energy: 16, hunger: -4 }));
+restButton.addEventListener('click', () => applyEffect({ energy: 16, hunger: -4, happiness: -1 }));
 
 if (window.ethereum) {
     window.ethereum.on('accountsChanged', (accounts) => {
@@ -352,5 +394,9 @@ if (window.ethereum) {
     });
 }
 
+applyTimeDecay();
 renderPet();
 loadShopItems();
+
+setInterval(applyTimeDecay, decayIntervalMs);
+setInterval(showRandomDialog, dialogIntervalMs);
