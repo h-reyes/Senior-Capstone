@@ -50,8 +50,8 @@ SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/YOUR_ALCHEMY_KEY
 DEPLOYER_PRIVATE_KEY=YOUR_TEST_WALLET_PRIVATE_KEY
 
 DB_NAME=webapp
-DB_USER=root
-DB_PASSWORD=admin123
+DB_USER=your_username
+DB_PASSWORD=your_password
 DB_HOST=localhost
 DB_PORT=3306
 ```
