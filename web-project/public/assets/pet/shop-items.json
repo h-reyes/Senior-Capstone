@@ -11,6 +11,18 @@
       }
     },
     {
+      "id": "food-Extraordinary_Kibble.png",
+      "type": "food",
+      "name": "Extraordinary Kibble",
+      "src": "/assets/pet/food/Extraordinary_Kibble.png",
+      "priceEth": "0.0002",
+      "effect": {
+        "hunger": 45,
+        "happiness": 6,
+        "energy": -12
+      }
+    },
+    {
       "id": "default-spark-collar",
       "type": "accessory",
       "name": "Spark Collar",

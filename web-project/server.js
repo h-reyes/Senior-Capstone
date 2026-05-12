@@ -5,6 +5,8 @@ const express = require('express');
 const pageRoutes = require('./routes/pageRoutes');
 const authRoutes = require('./routes/authRoutes');
 const petAssetRoutes = require('./routes/petAssetRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
+const { initializeAuditStore } = require('./db/auditStore');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -44,9 +46,16 @@ app.use(express.static(path.join(__dirname, 'public'), {
 }));
 
 app.use(authRoutes);
+app.use(transactionRoutes);
 app.use(petAssetRoutes);
 app.use(pageRoutes);
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+async function startServer() {
+    await initializeAuditStore();
+
+    app.listen(port, () => {
+        console.log(`Server running at http://localhost:${port}`);
+    });
+}
+
+startServer();

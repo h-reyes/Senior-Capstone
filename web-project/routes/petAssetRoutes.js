@@ -18,7 +18,6 @@ const itemTypeByFolder = {
     accessories: 'accessory',
     pets: 'pet',
 };
-const extraordinaryFoodEffect = { hunger: 45, happiness: 6, energy: -12 };
 
 function cleanName(fileName) {
     return path.basename(fileName, path.extname(fileName))
@@ -30,10 +29,6 @@ function cleanName(fileName) {
 }
 
 function priceForFolder(folderName, rawName) {
-    if (rawName.toLowerCase().includes('extraordinary')) {
-        return '0.0002';
-    }
-
     if (folderName === 'food') {
         return '0.0001';
     }
@@ -46,13 +41,7 @@ function priceForFolder(folderName, rawName) {
 }
 
 function effectForAsset(folderName, rawName) {
-    const baseEffect = { ...(baseEffectsByFolder[folderName] || {}) };
-
-    if (folderName === 'food' && rawName.toLowerCase().includes('extraordinary')) {
-        return { ...extraordinaryFoodEffect };
-    }
-
-    return baseEffect;
+    return { ...(baseEffectsByFolder[folderName] || {}) };
 }
 
 function applyFilenameOverrides(item, rawName) {
@@ -122,6 +111,12 @@ function readManifestItems() {
     })).filter((item) => item.id && item.type && item.name && item.priceEth);
 }
 
+function readManifestAssetSources() {
+    return new Set(readManifestItems()
+        .map((item) => item.src)
+        .filter(Boolean));
+}
+
 function listImageAssets(folderName) {
     if (!assetFolders.includes(folderName)) {
         return [];
@@ -138,9 +133,15 @@ function listImageAssets(folderName) {
         return [];
     }
 
+    const manifestAssetSources = readManifestAssetSources();
+
     return fs.readdirSync(folderPath, { withFileTypes: true })
         .filter((entry) => entry.isFile())
         .filter((entry) => allowedExtensions.has(path.extname(entry.name).toLowerCase()))
+        .filter((entry) => {
+            const assetSrc = `/assets/pet/${folderName}/${encodeURIComponent(entry.name)}`;
+            return !manifestAssetSources.has(assetSrc);
+        })
         .map((entry) => {
             const rawName = path.basename(entry.name, path.extname(entry.name));
             const filePath = path.join(folderPath, entry.name);

@@ -81,6 +81,7 @@ module.exports = {
     clearSessionCookie,
     createSession,
     destroySession,
+    getSession,
     requireLogin,
     setSessionCookie,
 };

@@ -3,8 +3,10 @@ const {
     clearSessionCookie,
     createSession,
     destroySession,
+    getSession,
     setSessionCookie,
 } = require('../auth/sessionStore');
+const { recordLoginEvent } = require('../db/auditStore');
 
 const router = express.Router();
 
@@ -16,7 +18,7 @@ const users = [
     },
 ];
 
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     const user = users.find((account) => account.email === email);
@@ -24,13 +26,18 @@ router.post('/login', (req, res) => {
     if (user && user.password === password) {
         const sessionId = createSession(user.email);
         setSessionCookie(res, sessionId);
+        await recordLoginEvent(req, user.email, 'login_success');
         return res.json({ success: true });
+    }
+
+    if (email) {
+        await recordLoginEvent(req, email, 'login_failed');
     }
 
     return res.status(401).json({ error: 'Invalid email or password.' });
 });
 
-router.post('/signup', (req, res) => {
+router.post('/signup', async (req, res) => {
     const { name, email, password, confirmPassword } = req.body;
 
     if (!name || !email || !password || !confirmPassword) {
@@ -48,11 +55,18 @@ router.post('/signup', (req, res) => {
     }
 
     users.push({ name, email, password });
+    await recordLoginEvent(req, email, 'signup_success');
 
     return res.status(201).json({ success: true });
 });
 
-router.post('/logout', (req, res) => {
+router.post('/logout', async (req, res) => {
+    const session = getSession(req);
+
+    if (session && session.email) {
+        await recordLoginEvent(req, session.email, 'logout');
+    }
+
     destroySession(req);
     clearSessionCookie(res);
     return res.send(`

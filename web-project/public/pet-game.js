@@ -320,6 +320,27 @@ async function buyOrUseItem(item) {
             }],
         });
 
+        try {
+            await fetch('/api/transactions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    walletAddress,
+                    burnContractAddress,
+                    chainId: currentChainId,
+                    transactionHash,
+                    itemId: item.id,
+                    itemName: item.name,
+                    itemType: item.type,
+                    priceEth: item.priceEth,
+                }),
+            });
+        } catch (error) {
+            console.error('Transaction was sent, but MySQL copy failed:', error);
+        }
+
         if (!petState.owned.includes(item.id)) {
             petState.owned.push(item.id);
         }
