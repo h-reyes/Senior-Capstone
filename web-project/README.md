@@ -1,79 +1,131 @@
 # Crypto Pet Banking App
 
-This is a senior capstone web project built with Express, MetaMask, and Hardhat. It includes a basic account portal, a wallet dashboard, and a crypto pet mini game where shop purchases are sent to a burn contract.
+Senior capstone web project built with Express, MetaMask, Hardhat, Sequelize, and MySQL. The app includes a basic account portal, a wallet dashboard, and a crypto pet mini game where shop purchases are sent through MetaMask to a deployed burn contract.
+
+MySQL is used only as a record-only audit copy for login activity and pet shop transactions. If MySQL is not configured or is unavailable, the main app still runs.
 
 ## Features
 
-- Express server with separate route files
-- Login, signup, dashboard, and pet game pages
+- Express web server with separate route files
+- Login, signup, logout, dashboard, and pet game pages
 - MetaMask wallet connection
-- Wallet balance and explorer links
+- Wallet balance display and explorer links
 - Crypto pet with hunger, happiness, and energy stats
-- Pet stats drain over time
-- Rest is the only free pet action
-- Food, accessories, and pet customization items are purchased through MetaMask
-- Burn vault smart contract that permanently locks sent native-chain currency
-- Drop-in pet shop asset folders for custom images
+- Free rest action
+- Pet shop purchases sent through MetaMask
+- Sepolia burn vault smart contract
+- MySQL audit tables for login events and transaction copies
+- Drop-in pet shop image folders and manifest-based shop items
 
 ## Requirements
 
-- Node.js
-- npm
+- Node.js and npm
+- MySQL Server running locally
 - MetaMask browser extension
 - Sepolia test ETH for contract deployment and test purchases
+- Alchemy or Infura Sepolia RPC URL
 
-## Install
+## 1. Install Dependencies
+
+From the `web-project` folder:
 
 ```powershell
 npm install
 ```
 
-## Run the Web App
+This installs Express, Sequelize, MySQL support, Hardhat, and Ethers.
+
+## 2. Create the Environment File
+
+Create `.env` from `.env.example`:
+
+```powershell
+copy .env.example .env
+```
+
+Example local `.env`:
+
+```env
+SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/YOUR_ALCHEMY_KEY
+DEPLOYER_PRIVATE_KEY=YOUR_TEST_WALLET_PRIVATE_KEY
+
+DB_NAME=webapp
+DB_USER=root
+DB_PASSWORD=admin123
+DB_HOST=localhost
+DB_PORT=3306
+```
+
+Use a test wallet only. Never commit `.env`, private keys, or funded wallet credentials.
+
+## 3. Set Up MySQL
+
+Start your local MySQL server, then create the database:
+
+```sql
+CREATE DATABASE webapp;
+```
+
+If you use a different database name, update `DB_NAME` in `.env`.
+
+The app creates these tables automatically on startup:
+
+```text
+login_events
+transaction_copies
+```
+
+MySQL records only copies of activity. It does not replace the existing login/session behavior or pet state.
+
+## 4. Start the Local App
 
 ```powershell
 npm start
 ```
 
-The app starts at:
+The app runs at:
 
 ```text
 http://localhost:5000
 ```
 
-If another server is already using that port, run with a different port:
+Expected successful startup:
+
+```text
+MySQL audit copy connected.
+Server running at http://localhost:5000
+```
+
+If MySQL is missing or misconfigured, the app still starts and shows a warning that SQL recording is disabled.
+
+To use another port:
 
 ```powershell
 $env:PORT='3002'; npm start
 ```
 
-## Test Login
+## 5. Log In Locally
 
-Use the seeded test account:
+Seeded test account:
 
 ```text
 Email: user@example.com
 Password: password123
 ```
 
-## Main Pages
-
-- `/` - home page
-- `/login` - login page
-- `/signup` - signup page
-- `/dashboard` - wallet dashboard
-- `/pet` - crypto pet game
-
-## Smart Contract
-
-The burn contract is:
+Main routes:
 
 ```text
-contracts/PetBurnVault.sol
+/          Home
+/login     Login
+/signup    Signup
+/dashboard Wallet dashboard
+/pet       Crypto pet game
 ```
 
-It accepts native-chain payments and has no owner or withdrawal function. Funds sent to it are intentionally locked.
+## 6. Deploy the Burn Contract
 
-Compile the contract:
+Compile:
 
 ```powershell
 npm run compile
@@ -85,34 +137,45 @@ Deploy to Sepolia:
 npm run deploy:sepolia
 ```
 
-After deployment, Hardhat prints the contract address and saves it to:
+Deployment output is saved to:
 
 ```text
 deployments/sepolia/PetBurnVault.json
 ```
 
-Copy the deployed address into the pet page's burn contract address field.
+Copy the deployed contract address into the burn contract address field on the pet page. Make sure MetaMask is connected to Sepolia before buying pet shop items.
 
-## Environment Variables
+## 7. How SQL Recording Works
 
-Create `.env` from `.env.example`:
+Login records are written when:
 
-```powershell
-copy .env.example .env
-```
+- a login succeeds
+- a login fails
+- a signup succeeds
+- a logout occurs
 
-Required for deploying:
+Transaction records are written after MetaMask returns a transaction hash for a pet shop purchase.
+
+The transaction copy includes:
+
+- logged-in email
+- wallet address
+- burn contract address
+- chain ID
+- transaction hash
+- item ID, name, type, and price
+
+If a SQL insert fails, the app continues. For example, a MetaMask transaction can still complete even if MySQL recording fails.
+
+## 8. Pet Shop Assets
+
+Manifest items live here:
 
 ```text
-SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_PROJECT_ID
-DEPLOYER_PRIVATE_KEY=YOUR_TEST_WALLET_PRIVATE_KEY
+public/assets/pet/shop-items.json
 ```
 
-Use a test wallet. Do not use a wallet that holds important real funds.
-
-## Pet Shop Assets
-
-Custom shop images go here:
+Image folders:
 
 ```text
 public/assets/pet/food
@@ -120,33 +183,19 @@ public/assets/pet/accessories
 public/assets/pet/pets
 ```
 
-The default shop items live in:
+`Extraordinary_Kibble.png` is configured in `shop-items.json`, including its price and stat effects.
 
-```text
-public/assets/pet/shop-items.json
-```
-
-Food with `extraordinary` in the filename gets stronger default hunger effects than regular food.
-
-You can adjust item potency with filename tags:
-
-```text
-Extraordinary_Kibble_hunger50_energy-12_happiness6_price0.0002.png
-```
-
-Or use a sidecar JSON file:
-
-```text
-Extraordinary_Kibble.png
-Extraordinary_Kibble.json
-```
+Example item:
 
 ```json
 {
+  "id": "food-Extraordinary_Kibble.png",
+  "type": "food",
   "name": "Extraordinary Kibble",
+  "src": "/assets/pet/food/Extraordinary_Kibble.png",
   "priceEth": "0.0002",
   "effect": {
-    "hunger": 50,
+    "hunger": 45,
     "happiness": 6,
     "energy": -12
   }
@@ -159,10 +208,26 @@ More asset notes are in:
 public/assets/pet/README.md
 ```
 
+## Troubleshooting
+
+If the server says MySQL recording is disabled, check that `DB_NAME`, `DB_USER`, and `DB_HOST` are set in `.env`.
+
+If MySQL connection fails, confirm MySQL is running and the database exists:
+
+```sql
+SHOW DATABASES;
+```
+
+If MetaMask purchases fail, confirm:
+
+- MetaMask is installed
+- MetaMask is on Sepolia
+- the burn contract address is deployed on Sepolia
+- the wallet has Sepolia test ETH
+
 ## Safety Notes
 
-- Test on Sepolia before using any real network.
-- Purchases sent to `PetBurnVault` cannot be recovered.
-- Never commit `.env` or private keys.
-- Make sure MetaMask is on the same network where the burn contract was deployed.
-
+- Test on Sepolia only for development.
+- Funds sent to `PetBurnVault` are intentionally locked and cannot be withdrawn.
+- Do not use a wallet with real funds for development.
+- Rotate any private key that has been shared, committed, or exposed.
