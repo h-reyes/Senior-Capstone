@@ -51,6 +51,33 @@
             <a class="secondary-link" href="/signup">Create account</a>
         </section>
     </main>
+
+    <section class="readme-section" aria-labelledby="readme-title">
+        <div class="readme-heading">
+            <p class="eyebrow">Project Documentation</p>
+            <h2 id="readme-title">README.md</h2>
+        </div>
+        <pre class="readme-content" id="readmeContent">Loading README.md...</pre>
+    </section>
+
+    <script>
+        const readmeContent = document.getElementById('readmeContent');
+
+        fetch('/api/readme')
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('README.md could not be loaded.');
+                }
+
+                return response.text();
+            })
+            .then((markdown) => {
+                readmeContent.textContent = markdown;
+            })
+            .catch(() => {
+                readmeContent.textContent = 'README.md could not be loaded.';
+            });
+    </script>
 </body>
 
 </html>

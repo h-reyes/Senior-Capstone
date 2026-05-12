@@ -1,9 +1,11 @@
 const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const { requireLogin } = require('../auth/sessionStore');
 
 const router = express.Router();
 const viewsPath = path.resolve(__dirname, '..', 'views');
+const readmePath = path.resolve(__dirname, '..', 'README.md');
 const allowedViews = new Set([
     'home.html',
     'login.html',
@@ -29,6 +31,10 @@ function sendView(res, fileName) {
 
 router.get('/', (req, res) => {
     sendView(res, 'home.html');
+});
+
+router.get('/api/readme', (req, res) => {
+    return res.type('text/markdown').sendFile(readmePath);
 });
 
 router.get('/login', (req, res) => {

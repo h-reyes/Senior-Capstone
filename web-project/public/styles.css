@@ -160,6 +160,39 @@ body {
     width: min(720px, 100%);
 }
 
+.readme-section {
+    width: min(1040px, calc(100% - 48px));
+    margin: 0 auto 56px;
+    padding: 28px;
+    background: #ffffff;
+    border: 1px solid rgba(101, 116, 139, 0.16);
+    border-radius: 8px;
+    box-shadow: 0 18px 48px rgba(20, 33, 61, 0.1);
+}
+
+.readme-heading {
+    margin-bottom: 18px;
+}
+
+.readme-heading h2 {
+    margin: 0;
+    color: #111827;
+    font-size: 1.4rem;
+}
+
+.readme-content {
+    max-height: 520px;
+    overflow: auto;
+    margin: 0;
+    padding: 20px;
+    background: #111827;
+    border-radius: 8px;
+    color: #e5e7eb;
+    font: 0.92rem/1.6 Consolas, "Courier New", monospace;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
 .dashboard-panel {
     width: min(1040px, 100%);
 }
@@ -778,7 +811,13 @@ button:active,
     .login-card,
     .home-panel,
     .dashboard-panel,
-    .pet-panel {
+    .pet-panel,
+    .readme-section {
         padding: 28px 22px;
+    }
+
+    .readme-section {
+        width: calc(100% - 32px);
+        margin-bottom: 32px;
     }
 }
